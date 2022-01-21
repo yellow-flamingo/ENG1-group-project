@@ -1,32 +1,30 @@
 package dev.thelabradors.yorkpirates;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import java.awt.EventQueue;
+import javax.swing.JFrame;
 
-public class YorkPiratesGame extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
-	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
-	}
+public class YorkPiratesGame extends JFrame {
+    
+    public YorkPiratesGame() {
 
-	/*@Override
-	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
-		batch.begin();
-		//batch.draw(img, 0, 0);
-		batch.end();
-	}
-	
-	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
-	}
-	*/
+        initUI();
+    }
+
+    private void initUI() {
+
+        add(new Board());
+
+        setSize(500, 400);
+
+        setTitle("Application");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+    }    
+    
+    public static void main(String[] args) {
+        
+        YorkPiratesGame ex = new YorkPiratesGame();
+        ex.setVisible(true);
+        ;
+    }
 }
