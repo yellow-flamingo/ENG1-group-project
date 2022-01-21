@@ -15,11 +15,11 @@ public class YorkPiratesGame extends ApplicationAdapter {
 		img = new Texture("badlogic.jpg");
 	}
 
-	@Override
+	/*@Override
 	public void render () {
 		ScreenUtils.clear(1, 0, 0, 1);
 		batch.begin();
-		batch.draw(img, 0, 0);
+		//batch.draw(img, 0, 0);
 		batch.end();
 	}
 	
@@ -28,4 +28,5 @@ public class YorkPiratesGame extends ApplicationAdapter {
 		batch.dispose();
 		img.dispose();
 	}
+	*/
 }
