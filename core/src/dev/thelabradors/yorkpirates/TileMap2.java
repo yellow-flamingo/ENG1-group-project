@@ -1,19 +1,24 @@
 package dev.thelabradors.yorkpirates;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -29,41 +34,46 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
     SpriteBatch spriteBatch;
     ShapeRenderer shapeRenderer;
     TiledMapRenderer tiledMapRenderer;
-    Texture texture;
+    BitmapFont font;
     Player player;
     Building building1;
+
+    AssetManager manager;
 
     Vector2 position;
     Vector2 barrelOffset;
     float angle;
 
     ArrayList<Bullet> bullets;
-    ArrayList<Building> enemys;
+    ArrayList<Enemy> enemys;
     @Override
     public void create() {
         float aspectRatio = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
         System.out.println("The width: " + Gdx.graphics.getWidth());
         System.out.println("The height: " + Gdx.graphics.getHeight());
         camera = new OrthographicCamera(V_WIDTH, V_HEIGHT);
-        //camera = new OrthographicCamera((float)Gdx.graphics.getWidth(), (float)Gdx.graphics.getHeight());
-        
-        // viewport = new FitViewport(V_WIDTH, V_HEIGHT, camera);
-        // viewport.apply();
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         viewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
         TiledMap tiledMap = new TmxMapLoader().load("Test1.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         
         spriteBatch = new SpriteBatch();
+        font = new BitmapFont();
+
+        manager = new AssetManager();
+        manager.load("badlogic.jpg", Texture.class);
+        manager.load("Boat2.png", Texture.class);
+        manager.load("building.png", Texture.class);
+        manager.finishLoading();
+
         shapeRenderer = new ShapeRenderer();
         Gdx.input.setInputProcessor(this);
         position = new Vector2();
         barrelOffset = new Vector2(1.0f, -0.5f).scl(0.5f); // Relative coordinates to where the barrel is in the sprite
-        player = new Player(new Sprite(new Texture("Boat2.png")));
-
+        player = new Player((Texture) (manager.get("Boat2.png", Texture.class)), (TiledMapTileLayer) tiledMap.getLayers().get(1));
         bullets = new ArrayList<>();
         enemys = new ArrayList<>();
-        building1 = new Building(new Sprite(new Texture("building.png")), 500, 500);
+        building1 = new Building((Texture) (manager.get("building.png", Texture.class)), 500, 500);
         enemys.add(building1);
     }
     @Override
@@ -73,6 +83,10 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
 
     @Override
     public void render() {
+        if (!manager.update()){
+            float progress = manager.getProgress();
+            System.out.println("Loading... " + progress * 100 + "%");
+        }
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.position.set(position, 0);
@@ -102,31 +116,39 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
         }
         */
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
+        ArrayList<Enemy> enemiesToRemove = new ArrayList<>();
         for (Bullet bullet:bullets){
             bullet.draw(spriteBatch);
-            if (bullet.remove){
-                bulletsToRemove.add(bullet);
-            }
-            for (Building enemy : enemys){
+            for (Enemy enemy : enemys){
                 if (bullet.collisionCheck(enemy.getBoundingRectangle())){
                     enemy.hit();
+                    enemy.healthUpdate();
                 }
             }
+            if (bullet.getRemove()){
+                bulletsToRemove.add(bullet);
+            }
         }
-        bullets.removeAll(bulletsToRemove);
-
-        ArrayList<Object> enemiesToRemove = new ArrayList<>();
-        for (Object enemy:enemys){
-            ((Building) enemy).draw(spriteBatch);
-            ((Building) enemy).update();
-            if (((Building) enemy).getRemove()){
+        for (Enemy enemy : enemys){
+            enemy.draw(spriteBatch);
+            if (enemy.getRemove()){
                 enemiesToRemove.add(enemy);
             }
         }
+        bullets.removeAll(bulletsToRemove);
         enemys.removeAll(enemiesToRemove);
+
         player.draw(spriteBatch);
-        
+        font.getData().setScale(15f);
+        font.draw(spriteBatch, "Hello :)", 100, 100);
         spriteBatch.end();
+    }
+
+    @Override
+    public void dispose(){
+        super.dispose();
+        manager.dispose();
+        font.dispose();
     }
     @Override
     public boolean keyDown(int keycode) {
@@ -143,7 +165,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
             player.moveDown();
         }
         if (keycode == Input.Keys.SPACE){
-            bullets.add(new Bullet(new Texture("badlogic.jpg"), player.getPosition(), new Vector2(0,0)));
+            bullets.add(new Bullet((Texture) (manager.get("badlogic.jpg", Texture.class)), player.getPosition(), new Vector2(0,0)));
         }
         if (keycode == Input.Keys.P){
             System.out.println(camera.position);

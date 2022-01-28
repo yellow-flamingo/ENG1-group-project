@@ -5,7 +5,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import java.awt.*;
 import org.lwjgl.util.Dimension;
 
-import dev.thelabradors.yorkpirates.TileMap;
 import dev.thelabradors.yorkpirates.TileMap2;
 
 public class DesktopLauncher {
