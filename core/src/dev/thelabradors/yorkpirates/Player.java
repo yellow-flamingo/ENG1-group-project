@@ -12,7 +12,6 @@ public class Player extends Sprite{
     public Vector2 velocity = new Vector2();
     public static float speed = 250;
     public static String blockedKey = "blocked";
-    public Texture texture;
     public TiledMapTileLayer collisionLayer;
     float w, h;
     public Player(Texture tex , TiledMapTileLayer collisionLayer){
