@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -142,6 +143,11 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
         font.getData().setScale(15f);
         font.draw(spriteBatch, "Hello :)", 100, 100);
         spriteBatch.end();
+        System.out.println(player.angle);
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeType.Line);
+        shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
+        shapeRenderer.end();
     }
 
     @Override
@@ -173,6 +179,18 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
         if (keycode == Input.Keys.U){
             player.getCoords();
         }
+        if (keycode == Input.Keys.UP){
+            player.moveForward();
+        }
+        if (keycode == Input.Keys.DOWN){
+            player.moveBackwards();
+        }
+        if (keycode == Input.Keys.LEFT){
+            player.turnLeft();
+        }
+        if (keycode == Input.Keys.RIGHT){
+            player.turnRight();
+        }
         return true;
     }
     @Override
@@ -189,7 +207,19 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
         if (keycode == Input.Keys.S){
             player.stopVertical();
         }
-        return false;
+        if (keycode == Input.Keys.UP){
+            player.stopMove();
+        }
+        if (keycode == Input.Keys.DOWN){
+            player.stopMove();
+        }
+        if (keycode == Input.Keys.LEFT){
+            player.stopTurn();
+        }
+        if (keycode == Input.Keys.RIGHT){
+            player.stopTurn();
+        }
+        return true;
     }
     @Override
     public boolean keyTyped(char character) {

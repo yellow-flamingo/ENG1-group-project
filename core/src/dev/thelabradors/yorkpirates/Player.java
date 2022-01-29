@@ -7,13 +7,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 
 public class Player extends Sprite{
-    public Vector2 velocity = new Vector2();
-    public static float speed = 250;
+    public float speed = 0;
+    public static final float TOTALVELOCITY = 250;
     public static String blockedKey = "blocked";
     public TiledMapTileLayer collisionLayer;
     float w, h;
+    public float angle;
+    public float angleChange;
+    public Vector2 velocity = new Vector2();
     public Player(Texture tex , TiledMapTileLayer collisionLayer){
         super(tex);
         this.w = 117; //117
@@ -21,11 +25,18 @@ public class Player extends Sprite{
         setSize(w/2, h/2);
         this.setX(100);
         this.setY(100);
+        this.flip(false, false);
+        this.setRotation(angle);
         this.collisionLayer = collisionLayer;
     }
     public void update(float delta){
+        //Change the Angle
+        angle += angleChange*delta;
+        setRotation(angle);
+        velocity.x = speed*MathUtils.cosDeg(angle)*delta;
+        velocity.y = speed*MathUtils.sinDeg(angle)*delta;
         float oldX = getX(), oldY = getY();
-        setX(getX() + velocity.x * delta);
+        setX(getX() + velocity.x);
         boolean collisionX = false, collisionY = false;
         if (velocity.x < 0){
             collisionX = collidesLeft();
@@ -36,7 +47,7 @@ public class Player extends Sprite{
         if (collisionX){
             setX(oldX);
         }
-        setY(getY() + velocity.y * delta);
+        setY(getY() + velocity.y);
         if (velocity.y > 0){
             collisionY = collidesTop();
         }else if (velocity.y < 0){
@@ -74,6 +85,29 @@ public class Player extends Sprite{
         this.velocity.y = 0;
     }
 
+    //Rotating movement
+    public void turnRight() {
+        angleChange = -90.0f;
+    }
+
+    public void turnLeft() {
+        angleChange = 90.0f;
+    }
+
+    public void moveForward() {
+        speed = TOTALVELOCITY;
+    }
+
+    public void moveBackwards() {
+        speed = -TOTALVELOCITY;
+    }
+    public void stopTurn(){
+        angleChange = 0;
+    }
+    public void stopMove(){
+        speed = 0;
+    }
+
     //Collision Code
 	private boolean isCellBlocked(float x, float y) {
 		Cell cell = collisionLayer.getCell((int) (x / collisionLayer.getTileWidth()), (int) (y / collisionLayer.getTileHeight()));
@@ -107,5 +141,8 @@ public class Player extends Sprite{
     //getter for x,y coords
     public void getCoords(){
         System.out.println("x coord: " + getX() + " y coord: " + getY());
+    }
+    public float getAngle(){
+        return this.angle;
     }
 }
