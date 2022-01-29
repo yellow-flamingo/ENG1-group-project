@@ -141,16 +141,16 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.A){
-            player.moveLeft();
+            player.turnLeft();
         }
         if (keycode == Input.Keys.D){
-            player.moveRight();
+            player.turnRight();
         }
         if (keycode == Input.Keys.W){
-            player.moveUp();
+            player.moveForward();
         }
         if (keycode == Input.Keys.S){
-            player.moveDown();
+            player.moveBackwards();
         }
         if (keycode == Input.Keys.SPACE){
             bullets.add(new Bullet(manager.get("badlogic.jpg", Texture.class), player.getCenter(), player.getCorrectedAngle()));
@@ -178,16 +178,16 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.A){
-            player.stopHorizontal();
+            player.stopTurn();
         }
         if (keycode == Input.Keys.D){
-            player.stopHorizontal();
+            player.stopTurn();
         }
         if (keycode == Input.Keys.W){
-            player.stopVertical();
+            player.stopMove();
         }
         if (keycode == Input.Keys.S){
-            player.stopVertical();
+            player.stopMove();
         }
         if (keycode == Input.Keys.UP){
             player.stopMove();
