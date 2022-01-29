@@ -97,25 +97,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
         tiledMapRenderer.render();
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
-        
-        /*
-        float delta = Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.A))
-            player.moveLeft();
-        if (Gdx.input.isKeyPressed(Input.Keys.D))
-            player.moveRight();
-        if (Gdx.input.isKeyPressed(Input.Keys.W))
-            player.moveUp();
-        if (Gdx.input.isKeyPressed(Input.Keys.S))
-            player.moveDown();
-		if (Gdx.input.isKeyPressed(Input.Keys.U))
-			System.out.println(bullets.size());
-        if (Gdx.input.isKeyJustPressed(Input.Keys.P)){
-			for(Bullet b : bullets){
-                b.coordOut();
-            }
-        }
-        */
+
         ArrayList<Bullet> bulletsToRemove = new ArrayList<>();
         ArrayList<Enemy> enemiesToRemove = new ArrayList<>();
         for (Bullet bullet:bullets){
@@ -171,7 +153,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
             player.moveDown();
         }
         if (keycode == Input.Keys.SPACE){
-            bullets.add(new Bullet((Texture) (manager.get("badlogic.jpg", Texture.class)), player.getPosition(), new Vector2(0,0)));
+            bullets.add(new Bullet(manager.get("badlogic.jpg", Texture.class), player.getCenter(), player.getCorrectedAngle()));
         }
         if (keycode == Input.Keys.P){
             System.out.println(camera.position);

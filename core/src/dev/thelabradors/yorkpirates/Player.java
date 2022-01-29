@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.*;
 public class Player extends Sprite{
     public float speed = 0;
     public static final float TOTALVELOCITY = 250;
+    public static final float IMAGE_CORRECTION_ANGLE = 90;
     public static String blockedKey = "blocked";
     public TiledMapTileLayer collisionLayer;
     float w, h;
@@ -26,6 +27,9 @@ public class Player extends Sprite{
         this.setX(100);
         this.setY(100);
         this.flip(false, false);
+        //Used to rotate around the center of the image, otherwise, if the image is scaled
+        //then the image will rotate around the original size center
+        this.setOriginCenter();
         this.setRotation(angle);
         this.collisionLayer = collisionLayer;
     }
@@ -33,8 +37,12 @@ public class Player extends Sprite{
         //Change the Angle
         angle += angleChange*delta;
         setRotation(angle);
-        velocity.x = speed*MathUtils.cosDeg(angle)*delta;
-        velocity.y = speed*MathUtils.sinDeg(angle)*delta;
+        //Angle changed for velocity, since the default 0 degrees is the "positive x on a 2D graph"
+        // Some vector maths.
+        velocity.x = speed*MathUtils.cosDeg(getCorrectedAngle())*delta;
+        velocity.y = speed*MathUtils.sinDeg(getCorrectedAngle())*delta;
+
+        //Checking if any collision has occured, if so, move the player back to the old coords
         float oldX = getX(), oldY = getY();
         setX(getX() + velocity.x);
         boolean collisionX = false, collisionY = false;
@@ -144,5 +152,11 @@ public class Player extends Sprite{
     }
     public float getAngle(){
         return this.angle;
+    }
+    public float getCorrectedAngle(){
+        return this.angle + IMAGE_CORRECTION_ANGLE;
+    }
+    public Vector2 getCenter() {
+        return new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
     }
 }
