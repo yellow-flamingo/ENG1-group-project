@@ -44,6 +44,14 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     Building building1;
     Coin coin1;
     Coin coin2;
+    Coin coin3;
+    Coin coin4;
+    Coin coin5;
+    Coin coin6;
+    Coin coin7;
+    Coin coin8;
+    Coin coin9;
+    Coin coin10;
     InputProcessor inputProcessor;
 
     AssetManager manager;
@@ -93,11 +101,26 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         coins = new ArrayList<>();
         building1 = new Building((Texture) (manager.get("building.png", Texture.class)), 500, 500);
         enemys.add(building1); 
-        coin1 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 700);
+        coin1 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 750);
         coins.add(coin1);
         coin2 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 250, 250);
         coins.add(coin2);
-        
+        coin3 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 300, 500);
+        coins.add(coin3);
+        coin4 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 350);
+        coins.add(coin4);
+        coin5 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 1000, 800);
+        coins.add(coin5);
+        coin6 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 850, 200);
+        coins.add(coin6);
+        coin7 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 325, 1500);
+        coins.add(coin7);
+        coin8 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 1300);
+        coins.add(coin8);
+        coin9 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 1700);
+        coins.add(coin9);
+        coin10 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 1500, 1200);
+        coins.add(coin10);
     }
 
 //    @Override
@@ -169,9 +192,12 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         }
         bullets.removeAll(bulletsToRemove);
         enemys.removeAll(enemiesToRemove);
-        
+
         for (Coin coin : coins){
             coin.draw(spriteBatch);
+            if(coin.collisionCheck(player.getBoundingRectangle())){
+                coin.getRemove();
+            }
             if (coin.getRemove()){
                 coinsToRemove.add(coin);
             }
@@ -181,7 +207,8 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
         player.draw(spriteBatch);
         font.getData().setScale(15f);
-        font.draw(spriteBatch, Tasks.getNewTask(), 100, 100);
+        font.draw(spriteBatch, Tasks.getNewTask(), 300, 300);
+        font.draw(spriteBatch, "Coins: " + Coin.getNumCoins(), 100, 20000);
         spriteBatch.end();
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeType.Line);
