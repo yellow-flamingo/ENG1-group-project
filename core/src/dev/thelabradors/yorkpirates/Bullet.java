@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector;
@@ -19,8 +20,7 @@ public class Bullet extends Sprite{
     Texture texture;
     public Bullet(Texture texture, Vector2 position, float angle){
         super(texture);
-        this.setSize(getWidth()/4, getHeight()/4);
-
+        this.setSize(getWidth()/24, getHeight()/24);
         setX(position.x - this.getWidth()/2);
         setY(position.y- this.getHeight()/2);
         this.startingPosition.set(getX(), getY());
@@ -52,5 +52,5 @@ public class Bullet extends Sprite{
     public boolean getRemove(){
         return this.remove;
     }
-
+    
 }

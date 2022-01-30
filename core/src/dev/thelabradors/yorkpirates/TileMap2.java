@@ -25,9 +25,14 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.awt.*;
 
-public class TileMap2 extends ApplicationAdapter implements InputProcessor, Screen{
+public class TileMap2 extends ApplicationAdapter implements InputProcessor, Screen {
+
+    YorkPiratesGame game;
+
     public static final int V_WIDTH = 1000;
     public static final int V_HEIGHT = 600;
+    public float cameraX;
+    public float cameraY;
     OrthographicCamera camera;
     Viewport viewport;
     SpriteBatch spriteBatch;
@@ -36,8 +41,10 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     BitmapFont font;
     Player player;
     Building building1;
-    public float cameraX;
-    public float cameraY;
+    Building building2;
+    Building building3;
+    Building building4;
+    InputProcessor inputProcessor;
 
     AssetManager manager;
 
@@ -48,8 +55,9 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     ArrayList<Bullet> bullets;
     ArrayList<Enemy> enemys;
 
-    @Override
-    public void create() {
+    //@Override
+    public TileMap2(YorkPiratesGame game) {
+        this.game = game;
         //float aspectRatio = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
         //System.out.println("The width: " + Gdx.graphics.getWidth());
         //System.out.println("The height: " + Gdx.graphics.getHeight());
@@ -63,14 +71,14 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         //viewport = new FitViewport(camera.viewportWidth/2, camera.viewportHeight/2, camera);
         TiledMap tiledMap = new TmxMapLoader().load("Test1.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-
+        
         spriteBatch = new SpriteBatch();
         font = new BitmapFont();
 
         manager = new AssetManager();
-        manager.load("badlogic.jpg", Texture.class);
+        manager.load("bullet.png", Texture.class);
         manager.load("Boat2.png", Texture.class);
-        manager.load("building.png", Texture.class);
+        manager.load("enemy-ship.png", Texture.class);
         manager.finishLoading();
 
         shapeRenderer = new ShapeRenderer();
@@ -80,9 +88,16 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         player = new Player((Texture) (manager.get("Boat2.png", Texture.class)), (TiledMapTileLayer) tiledMap.getLayers().get(1));
         bullets = new ArrayList<>();
         enemys = new ArrayList<>();
-        building1 = new Building((Texture) (manager.get("building.png", Texture.class)), 500, 500);
+        building1 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 1000, 600, 180.0f);
+        building2 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 700, 2200, 40.0f);
+        building3 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2600, 2500, -20.0f);
+        building4 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2700, 600, -150.0f);
         enemys.add(building1);
+        enemys.add(building2);
+        enemys.add(building3);
+        enemys.add(building4);
     }
+
 //    @Override
 //    public void resize(int width, int height){
 //        viewport.update(width, height);
@@ -90,37 +105,25 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
     @Override
     public void show() {
-
     }
 
     @Override
     public void render(float delta) {
 
-    }
-
-    @Override
-    public void resize(int width, int height){
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void render() {
         if (!manager.update()){
             float progress = manager.getProgress();
             System.out.println("Loading... " + progress * 100 + "%");
         }
+
+        System.out.println("building1 health: " + building1.health);
+
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         cameraX = (float) (player.getX() + Gdx.graphics.getWidth()/1.1 + player.getWidth());
         cameraY = (float) (player.getY() + Gdx.graphics.getHeight()/1.2 + player.getHeight());
 
         //camera.position.set(position, 0);
-        //camera.position.set((float) (player.getX()+(Toolkit.getDefaultToolkit().getScreenSize().getWidth()/1.4) + player.getWidth()), (float) (player.getY()+Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.5) + player.getHeight()/2, 0);
+
         if (player.getX() < 100) {
             cameraX = 100 + (float) (Gdx.graphics.getWidth()/1.1 + player.getWidth());
         }
@@ -134,11 +137,9 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         if (player.getY() > 1674) {
             cameraY = 1674 + (float) (Gdx.graphics.getHeight()/1.2 + player.getHeight());
         }
-
+        //camera.position.set(position, 0);
 
         camera.position.set(cameraX, cameraY, 0);
-
-        //camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
@@ -168,15 +169,28 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         bullets.removeAll(bulletsToRemove);
         enemys.removeAll(enemiesToRemove);
 
+
         player.draw(spriteBatch);
         font.getData().setScale(15f);
         font.draw(spriteBatch, "Hello :)", 100, 100);
         spriteBatch.end();
-        //System.out.println(player.angle);
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeType.Line);
         shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
         shapeRenderer.end();
+
+        if (enemys.isEmpty()) {
+            game.setScreen(new GameWonScreen(game));
+        }
+
+    }
+
+    @Override
+    public void resize(int width, int height){
+    }
+
+    @Override
+    public void hide() {
     }
 
     @Override
@@ -185,28 +199,12 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         manager.dispose();
         font.dispose();
     }
+
+
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.A){
-            player.moveLeft();
-        }
-        if (keycode == Input.Keys.D){
-            player.moveRight();
-        }
-        if (keycode == Input.Keys.W){
-            player.moveUp();
-        }
-        if (keycode == Input.Keys.S){
-            player.moveDown();
-        }
         if (keycode == Input.Keys.SPACE){
-            bullets.add(new Bullet(manager.get("badlogic.jpg", Texture.class), player.getCenter(), player.getCorrectedAngle()));
-        }
-        if (keycode == Input.Keys.P){
-            System.out.println(camera.position);
-        }
-        if (keycode == Input.Keys.U){
-            player.getCoords();
+            bullets.add(new Bullet(manager.get("bullet.png", Texture.class), player.getCenter(), player.getCorrectedAngle()));
         }
         if (keycode == Input.Keys.UP){
             player.moveForward();
@@ -220,8 +218,42 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         if (keycode == Input.Keys.RIGHT){
             player.turnRight();
         }
+        if (keycode == Input.Keys.ENTER){
+            game.setScreen(new GameWonScreen(game));
+        }
         return true;
     }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
     @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.A){
@@ -250,34 +282,5 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         }
         return true;
     }
-    @Override
-    public boolean keyTyped(char character) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        // TODO Auto-generated method stub
-        return false;
-    }
+
 }

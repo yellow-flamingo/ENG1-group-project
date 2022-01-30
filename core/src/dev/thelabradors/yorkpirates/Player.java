@@ -19,8 +19,6 @@ public class Player extends Sprite{
     public float angle;
     public float angleChange;
     public Vector2 velocity = new Vector2();
-    public float oldX;
-    public float oldY;
     public Player(Texture tex , TiledMapTileLayer collisionLayer){
         super(tex);
         this.w = 117; //117
@@ -45,8 +43,7 @@ public class Player extends Sprite{
         velocity.y = speed*MathUtils.sinDeg(getCorrectedAngle())*delta;
 
         //Checking if any collision has occured, if so, move the player back to the old coords
-        oldX = getX();
-        oldY = getY();
+        float oldX = getX(), oldY = getY();
         setX(getX() + velocity.x);
         boolean collisionX = false, collisionY = false;
         if (velocity.x < 0){
@@ -120,10 +117,10 @@ public class Player extends Sprite{
     }
 
     //Collision Code
-    private boolean isCellBlocked(float x, float y) {
-        Cell cell = collisionLayer.getCell((int) (x / collisionLayer.getTileWidth()), (int) (y / collisionLayer.getTileHeight()));
-        return cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey);
-    }
+	private boolean isCellBlocked(float x, float y) {
+		Cell cell = collisionLayer.getCell((int) (x / collisionLayer.getTileWidth()), (int) (y / collisionLayer.getTileHeight()));
+		return cell != null && cell.getTile() != null && cell.getTile().getProperties().containsKey(blockedKey);
+	}
     public boolean collidesRight() {
         for(float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2)
             if(isCellBlocked(getX() + getWidth(), getY() + step))
@@ -148,7 +145,7 @@ public class Player extends Sprite{
             if(isCellBlocked(getX() + step, getY()))
                 return true;
         return false;
-    }
+        }
     //getter for x,y coords
     public void getCoords(){
         System.out.println("x coord: " + getX() + " y coord: " + getY());

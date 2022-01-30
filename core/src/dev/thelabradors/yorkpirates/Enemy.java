@@ -8,12 +8,14 @@ public class Enemy extends Sprite{
     public float x, y;
     public int health;
     public boolean remove;
-    public Enemy(Texture tex, float x, float y, int health){
+    public float angle;
+    public Enemy(Texture tex, float x, float y, int health, float angle){
         super(tex);
         setX(x);
         setY(y);
         this.health = health;
         this.remove = false;
+        this.setRotation(angle);
     }
     public void draw(SpriteBatch spriteBatch){
         super.draw(spriteBatch);
