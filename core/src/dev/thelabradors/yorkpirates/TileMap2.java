@@ -31,6 +31,8 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
     public static final int V_WIDTH = 1000;
     public static final int V_HEIGHT = 600;
+    public static float screenWidth = Gdx.graphics.getWidth();
+    public static float screenHeight = Gdx.graphics.getHeight();
     public float cameraX;
     public float cameraY;
     OrthographicCamera camera;
@@ -115,8 +117,6 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
             System.out.println("Loading... " + progress * 100 + "%");
         }
 
-        System.out.println("building1 health: " + building1.health);
-
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         cameraX = (float) (player.getX() + Gdx.graphics.getWidth()/1.1 + player.getWidth());
@@ -169,10 +169,12 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         bullets.removeAll(bulletsToRemove);
         enemys.removeAll(enemiesToRemove);
 
-
         player.draw(spriteBatch);
-        font.getData().setScale(15f);
-        font.draw(spriteBatch, "Hello :)", 100, 100);
+        font.getData().setScale(5f);
+        font.draw(spriteBatch, "UP: FORWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - screenHeight/2);
+        font.draw(spriteBatch, "LEFT: TURN LEFT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.6));
+        font.draw(spriteBatch, "DOWN: BACKWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.3));
+        font.draw(spriteBatch, "RIGHT: TURN RIGHT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.1));
         spriteBatch.end();
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeType.Line);
