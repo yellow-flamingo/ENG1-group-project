@@ -3,10 +3,7 @@ package dev.thelabradors.yorkpirates;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -28,7 +25,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.awt.*;
 
-public class TileMap2 extends ApplicationAdapter implements InputProcessor{
+public class TileMap2 extends ApplicationAdapter implements InputProcessor, Screen{
     public static final int V_WIDTH = 1000;
     public static final int V_HEIGHT = 600;
     OrthographicCamera camera;
@@ -39,6 +36,8 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
     BitmapFont font;
     Player player;
     Building building1;
+    public float cameraX;
+    public float cameraY;
 
     AssetManager manager;
 
@@ -48,6 +47,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
 
     ArrayList<Bullet> bullets;
     ArrayList<Enemy> enemys;
+
     @Override
     public void create() {
         //float aspectRatio = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
@@ -89,7 +89,22 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
 //    }
 
     @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
+
+    }
+
+    @Override
     public void resize(int width, int height){
+    }
+
+    @Override
+    public void hide() {
+
     }
 
     @Override
@@ -100,22 +115,28 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor{
         }
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        cameraX = (float) (player.getX() + Gdx.graphics.getWidth()/1.1 + player.getWidth());
+        cameraY = (float) (player.getY() + Gdx.graphics.getHeight()/1.2 + player.getHeight());
+
         //camera.position.set(position, 0);
         //camera.position.set((float) (player.getX()+(Toolkit.getDefaultToolkit().getScreenSize().getWidth()/1.4) + player.getWidth()), (float) (player.getY()+Toolkit.getDefaultToolkit().getScreenSize().getHeight()/1.5) + player.getHeight()/2, 0);
-        if (player.getX() >= 100 && player.getX() <= 696) {
-            if (player.getY() >= 100 && player.getY() <= 1688) {
-                camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
-            } else {
-                camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
-                //camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), player.oldY, 0);
-            }
-        } else if (player.getY() >= 100 && player.getY() <= 1688) {
-            camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
-            //camera.position.set(player.oldX, (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
-        } else {
-            camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
-            //camera.position.set(player.oldX, player.oldY, 0);
+        if (player.getX() < 100) {
+            cameraX = 100 + (float) (Gdx.graphics.getWidth()/1.1 + player.getWidth());
         }
+        if (player.getY() < 100) {
+            cameraY = 100 + (float) (Gdx.graphics.getHeight()/1.2 + player.getHeight());
+        }
+
+        if (player.getX() > 700) {
+            cameraX = 700 + (float) (Gdx.graphics.getWidth()/1.1 + player.getWidth());
+        }
+        if (player.getY() > 1674) {
+            cameraY = 1674 + (float) (Gdx.graphics.getHeight()/1.2 + player.getHeight());
+        }
+
+
+        camera.position.set(cameraX, cameraY, 0);
 
         //camera.position.set((float) (player.getX()+(Gdx.graphics.getWidth()/1.1) + player.getWidth()), (float) (player.getY()+Gdx.graphics.getHeight()/1.2) + player.getHeight()/2, 0);
         camera.update();
