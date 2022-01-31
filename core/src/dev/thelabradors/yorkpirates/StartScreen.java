@@ -6,14 +6,13 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
-public class GameWonScreen implements Screen {
+public class StartScreen implements Screen {
 
     YorkPiratesGame game;
 
-    public GameWonScreen(YorkPiratesGame game) {
+    public StartScreen(YorkPiratesGame game) {
         this.game = game;
     }
-
 
     @Override
     public void show() {
@@ -33,9 +32,8 @@ public class GameWonScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         game.batch.begin();
-        game.font.getData().setScale(3f);
-        game.font.draw(game.batch, "You Won!", Gdx.graphics.getWidth() * .25f, Gdx.graphics.getHeight() * .75f);
-        game.font.draw(game.batch, "Pres space to play", Gdx.graphics.getWidth() * .25f, Gdx.graphics.getHeight() * .25f);
+        game.font.draw(game.batch, "You are playing as " + game.playerCollege + "!", Gdx.graphics.getWidth() * .25f, Gdx.graphics.getHeight() * .65f);
+        game.font.draw(game.batch, "Press space to play", Gdx.graphics.getWidth() * .25f, Gdx.graphics.getHeight() * .4f);
         game.batch.end();
     }
 

@@ -1,6 +1,5 @@
 package dev.thelabradors.yorkpirates;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -30,14 +28,12 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import java.awt.*;
 
-import static java.awt.Color.*;
-
-public class TileMap2 extends ApplicationAdapter implements InputProcessor, Screen {
+public class GameScreen extends ApplicationAdapter implements InputProcessor, Screen {
 
     YorkPiratesGame game;
 
@@ -76,25 +72,37 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     int mapHeight;
     int tilePixelWidth;
     int tilePixelHeight;
-    int mapPixelWidth;
-    int mapPixelHeight;
-    int mapBorderINT;
+    public static int mapPixelWidth;
+    public static int mapPixelHeight;
     int mapBorderRight;
     int mapBorderTop;
     long startTime;
 
     AssetManager manager;
 
-    Vector2 position;
-    Vector2 barrelOffset;
-    float angle;
+    boolean showControls = true;
 
     ArrayList<Bullet> bullets;
-    ArrayList<Enemy> enemys;
+    private BulletPool bulletPool;
+    static ArrayList<Enemy> enemys;
     ArrayList<Coin> coins;
+    private CoinPool coinPool;
+    Vector2 emptyVector = new Vector2();
+
+    int[] coinsData = {
+        700, 850, 22, 22,
+        250, 250, 22, 22,
+        300, 500, 22, 22,
+        500, 350, 22, 22,
+        2000, 800, 22, 22,
+        850, 200, 22, 22,
+        325, 1500, 22, 22,
+        500, 1300, 22, 22,
+        700, 1700, 22, 22,
+        1500, 1200, 22, 22};
 
     //@Override
-    public TileMap2(YorkPiratesGame game) {
+    public GameScreen(YorkPiratesGame game) {
         this.game = game;
     }
 
@@ -132,12 +140,16 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
         shapeRenderer = new ShapeRenderer();
         Gdx.input.setInputProcessor(this);
-        position = new Vector2();
-        barrelOffset = new Vector2(1.0f, -0.5f).scl(0.5f); // Relative coordinates to where the barrel is in the sprite
         player = new Player(manager.get("Boat2.png", Texture.class), (TiledMapTileLayer) tiledMap.getLayers().get(1));
+
         bullets = new ArrayList<>();
+        bulletPool = new BulletPool();
+
         enemys = new ArrayList<>();
+
         coins = new ArrayList<>();
+        coinPool = new CoinPool();
+        
         constantine = new Building(manager.get("enemy-ship.png", Texture.class), 1000, 600, 180.0f);
         goodricke = new Building(manager.get("enemy-ship.png", Texture.class), 700, 2200, 40.0f);
         james = new Building(manager.get("enemy-ship.png", Texture.class), 2600, 2500, -20.0f);
@@ -146,26 +158,15 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         enemys.add(goodricke);
         enemys.add(james);
         enemys.add(derwent);
-        coin1 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 850, 22, 22);
-        coins.add(coin1);
-        coin2 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 250, 250, 22, 22);
-        coins.add(coin2);
-        coin3 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 300, 500, 22, 22);
-        coins.add(coin3);
-        coin4 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 350, 22, 22);
-        coins.add(coin4);
-        coin5 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 2000, 800, 22, 22);
-        coins.add(coin5);
-        coin6 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 850, 200, 22, 22);
-        coins.add(coin6);
-        coin7 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 325, 1500, 22, 22);
-        coins.add(coin7);
-        coin8 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 1300, 22, 22);
-        coins.add(coin8);
-        coin9 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 1700, 22, 22);
-        coins.add(coin9);
-        coin10 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 1500, 1200, 22, 22);
-        coins.add(coin10);
+        //Adding all the current coins to the game.
+        for (int i = 0; i < coinsData.length; i+= 4){
+                Coin c = coinPool.obtain();
+                c.resetHelper(coinsData[i], coinsData[i+1],
+                    coinsData[i+2],coinsData[i+3]);
+                coins.add(c);
+        }
+        System.out.println(coins.size());
+        startTime = TimeUtils.millis();
     }
     @Override
     public void resize(int width, int height){
@@ -213,14 +214,18 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
             }
             if (bullet.getRemove()){
                 bulletsToRemove.add(bullet);
+                bulletPool.free(bullet);
             }
         }
+
         for (Enemy enemy : enemys){
             enemy.draw(spriteBatch);
             if (enemy.getRemove()){
                 enemiesToRemove.add(enemy);
                 if (enemy == constantine) {
-                    coins.add(new Coin((Texture) (manager.get("coin.png", Texture.class)), enemy.getX(), enemy.getY()+250, 10, 10));
+                    Coin c = coinPool.obtain();
+                    c.resetHelper(enemy.getX(), enemy.getY()+250, 10 ,10);
+                    coins.add(c);
                 } else if (enemy == goodricke) {
                     coins.add(new Coin((Texture) (manager.get("coin.png", Texture.class)), enemy.getX()+200, enemy.getY()-120, 10, 10));
                 } else if (enemy == james) {
@@ -234,32 +239,40 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
         for (Coin coin : coins){
             coin.draw(spriteBatch);
-            if(coin.collisionCheck(player.getBoundingRectangle())){
-                coin.getRemove();
-            }
+            coin.collisionCheck(player.getBoundingRectangle());
             if (coin.getRemove()){
                 coinsToRemove.add(coin);
+                coinPool.free(coin);
             }
         }
         coins.removeAll(coinsToRemove);
 
         player.draw(spriteBatch);
-        font.getData().setScale(5f);
+        font.getData().setScale(4.5f);
         font.setColor(1,1,1,1);
-        // font.draw(spriteBatch, "SPACE: SHOOT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/2.7));
-        // font.draw(spriteBatch, "UP: FORWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - screenHeight/2);
-        // font.draw(spriteBatch, "LEFT: TURN LEFT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.6));
-        // font.draw(spriteBatch, "DOWN: BACKWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.3));
-        // font.draw(spriteBatch, "RIGHT: TURN RIGHT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.1));
-        font.getData().setScale(8f);
-        font.draw(spriteBatch, Tasks.getNewTask(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2+450);
-        font.draw(spriteBatch, "Coins: " + Coin.getNumCoins(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2-900);
+        if (showControls == true){
+            font.draw(spriteBatch, "SPACE: SHOOT",      (float) (camera.position.x + 50),    (float) (camera.position.y - 90));
+            font.draw(spriteBatch, "UP/W: FORWARDS",      (float) (camera.position.x + 50),    (float) (camera.position.y - 150));
+            font.draw(spriteBatch, "LEFT/A: TURN LEFT",   (float) (camera.position.x + 50),    (float) (camera.position.y - 210));
+            font.draw(spriteBatch, "DOWN/S: BACKWARDS",   (float) (camera.position.x + 50),    (float) (camera.position.y - 270));
+            font.draw(spriteBatch, "RIGHT/D: TURN RIGHT", (float) (camera.position.x + 50),    (float) (camera.position.y - 330));
+            font.draw(spriteBatch, "H: toggle help",    (float) (camera.position.x + 50),    (float) (camera.position.y - 390));
+        }
+        font.getData().setScale(6f);
+        font.draw(spriteBatch, Tasks.getNewTask(), camera.position.x - V_WIDTH/2, camera.position.y + V_HEIGHT/2);
+        font.draw(spriteBatch, "Coins: " + Coin.getNumCoins(), camera.position.x - V_WIDTH/2, camera.position.y + V_HEIGHT/2 - 100);
+        font.draw(spriteBatch, "Points: " + (int) (TimeUtils.timeSinceMillis(startTime) / 500), camera.position.x - V_WIDTH/2, camera.position.y + V_HEIGHT/2 - 200);
+
         font.getData().setScale(4f);
         font.setColor(1,0,0,1);
         font.draw(spriteBatch, "Constantine", 935, 825);
         font.draw(spriteBatch, "Goodricke", 400, 2500);
         font.draw(spriteBatch, "James", 2400, 2800);
         font.draw(spriteBatch, "Derwent", 2500, 825);
+
+        font.getData().setScale(3f);
+        font.draw(spriteBatch, game.playerCollege, player.getX() - player.getWidth()/2, player.getY());
+
         spriteBatch.end();
 
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -302,7 +315,10 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
             player.moveBackwards();
         }
         if (keycode == Input.Keys.SPACE){
-            bullets.add(new Bullet(manager.get("bullet.png", Texture.class), player.getCenter(), player.getCorrectedAngle()));
+            Bullet b = bulletPool.obtain();
+            b.setdxdy(player.getCorrectedAngle());
+            b.setPos(player.getPosition());
+            bullets.add(b);
         }
         if (keycode == Input.Keys.P){
             System.out.println(camera.position);
@@ -324,6 +340,9 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         }
         if (keycode == Input.Keys.ENTER){
             game.setScreen(new GameWonScreen(game));
+        }
+        if (keycode == Input.Keys.H){
+            showControls = !showControls;
         }
         return true;
     }
@@ -385,5 +404,19 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     public boolean scrolled(float amountX, float amountY) {
         // TODO Auto-generated method stub
         return false;
+    }
+    private class BulletPool extends Pool<Bullet>{
+
+        @Override
+        protected Bullet newObject() {
+            return new Bullet(manager.get("bullet.png", Texture.class), player.getCenter(), player.getCorrectedAngle());
+        }
+    }
+    private class CoinPool extends Pool<Coin>{
+        @Override
+        protected Coin newObject() {
+            // TODO Auto-generated method stub
+            return new Coin(manager.get("coin.png", Texture.class), 0,0,1,1);
+        }
     }
 }

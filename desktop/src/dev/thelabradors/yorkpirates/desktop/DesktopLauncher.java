@@ -2,12 +2,8 @@ package dev.thelabradors.yorkpirates.desktop;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import java.awt.*;
 
 import dev.thelabradors.yorkpirates.YorkPiratesGame;
-import org.lwjgl.util.Dimension;
-
-import dev.thelabradors.yorkpirates.TileMap2;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
