@@ -13,11 +13,13 @@ import com.badlogic.gdx.math.Vector2;
 import org.w3c.dom.Text;
 
 public class Bullet extends Sprite{
+
     private Vector2 startingPosition = new Vector2();
     private boolean remove;
     public static final float SPEED = 500f;
     private float dx, dy;
     Texture texture;
+
     public Bullet(Texture texture, Vector2 position, float angle){
         super(texture);
         this.setSize(getWidth()/24, getHeight()/24);
@@ -29,6 +31,7 @@ public class Bullet extends Sprite{
         this.dx = SPEED * MathUtils.cosDeg(angle);
         this.dy = SPEED * MathUtils.sinDeg(angle);
     }
+
     public void update(float delta){
         setX(getX() + dx*delta);
         setY(getY() + dy*delta);
@@ -36,12 +39,15 @@ public class Bullet extends Sprite{
             this.remove = true;
         }
     }
+
     public void draw (SpriteBatch batch){
         update(Gdx.graphics.getDeltaTime());
         super.draw(batch);
     }
+
     public void coordOut() {
     }
+
     public boolean collisionCheck(Rectangle r){
         if (this.getBoundingRectangle().overlaps(r)){
             this.remove = true;
@@ -49,6 +55,7 @@ public class Bullet extends Sprite{
         }
         return false;
     }
+
     public boolean getRemove(){
         return this.remove;
     }

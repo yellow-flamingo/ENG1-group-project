@@ -46,6 +46,7 @@ public class Player extends Sprite{
         float oldX = getX(), oldY = getY();
         setX(getX() + velocity.x);
         boolean collisionX = false, collisionY = false;
+
         if (velocity.x < 0){
             collisionX = collidesLeft();
         }

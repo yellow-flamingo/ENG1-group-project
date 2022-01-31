@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.ApplicationListener;
-
 
 
 public class Tasks extends ApplicationAdapter{
@@ -53,28 +51,28 @@ public class Tasks extends ApplicationAdapter{
     }
 
     public static boolean shoot7Goodricke() {
-        if (TileMap2.goodricke.health == 0) {
+        if (GameScreen.goodricke.health == 0) {
             return true;
         }
         return false;
     }
 
     public static boolean shoot7Constantine() {
-        if (TileMap2.constantine.health == 0) {
+        if (GameScreen.constantine.health == 0) {
             return true;
         }
         return false;
     }
 
     public static boolean shoot7James() {
-        if (TileMap2.james.health == 0) {
+        if (GameScreen.james.health == 0) {
             return true;
         }
         return false;
     }
 
     public static boolean shoot7Derwent() {
-        if (TileMap2.derwent.health == 0) {
+        if (GameScreen.derwent.health == 0) {
             return true;
         }
         return false;

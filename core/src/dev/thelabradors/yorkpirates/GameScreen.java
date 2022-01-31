@@ -1,6 +1,5 @@
 package dev.thelabradors.yorkpirates;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.*;
@@ -9,9 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -21,14 +18,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import java.awt.*;
 
-import static java.awt.Color.*;
-
-public class TileMap2 extends ApplicationAdapter implements InputProcessor, Screen {
+public class GameScreen extends ApplicationAdapter implements InputProcessor, Screen {
 
     YorkPiratesGame game;
 
@@ -69,11 +62,11 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     float angle;
 
     ArrayList<Bullet> bullets;
-    ArrayList<Enemy> enemys;
+    static ArrayList<Enemy> enemys;
     ArrayList<Coin> coins;
 
     //@Override
-    public TileMap2(YorkPiratesGame game) {
+    public GameScreen(YorkPiratesGame game) {
         this.game = game;
         //float aspectRatio = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
         //System.out.println("The width: " + Gdx.graphics.getWidth());
@@ -206,6 +199,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
                 bulletsToRemove.add(bullet);
             }
         }
+
         for (Enemy enemy : enemys){
             enemy.draw(spriteBatch);
             if (enemy.getRemove()){
@@ -246,16 +240,19 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         font.getData().setScale(8f);
         font.draw(spriteBatch, Tasks.getNewTask(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2+450);
         font.draw(spriteBatch, "Coins: " + Coin.getNumCoins(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2-900);
+
         font.getData().setScale(4f);
         font.setColor(1,0,0,1);
         font.draw(spriteBatch, "Constantine", 935, 825);
         font.draw(spriteBatch, "Goodricke", 400, 2500);
         font.draw(spriteBatch, "James", 2400, 2800);
         font.draw(spriteBatch, "Derwent", 2500, 825);
+
+        font.getData().setScale(3f);
+        font.draw(spriteBatch, game.playerCollege, player.getX() - player.getWidth()/2, player.getY());
+
         spriteBatch.end();
         shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeType.Line);
-        shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
         shapeRenderer.end();
 
         if (enemys.isEmpty() && coins.isEmpty()) {

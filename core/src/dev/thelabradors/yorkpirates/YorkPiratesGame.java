@@ -8,12 +8,13 @@ public class YorkPiratesGame extends Game {
 
     SpriteBatch batch;
     BitmapFont font;
+    String playerCollege;
 
     @Override
     public void create() {
         font = new BitmapFont();
         batch = new SpriteBatch();
-        setScreen(new TileMap2(this));
+        setScreen(new ChooseCollegeScreen(this));
     }
 
     @Override
