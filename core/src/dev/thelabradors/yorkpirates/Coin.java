@@ -4,17 +4,27 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Pool.Poolable;
 
-public class Coin extends Sprite{
+public class Coin extends Sprite implements Poolable{
     public float x, y;
     public boolean remove;
+    public boolean check;
     static int numCoins;
+    public int value;
+    //Original width and height
+    private float w, h;
     public Coin(Texture tex, float x, float y, float scaleX, float scaleY){
         super(tex);
         setX(x);
         setY(y);
         this.remove = false;
-        this.setSize(getWidth()/scaleX, getHeight()/scaleY);
+        this.w = this.getTexture().getWidth();
+        this.h = this.getTexture().getHeight();
+        
+        this.setSize(w/scaleX, h/scaleY);
+
+        this.value = 1;
     }
     public void draw(SpriteBatch spriteBatch){
         super.draw(spriteBatch);
@@ -37,5 +47,21 @@ public class Coin extends Sprite{
 
     public static int getNumCoins() {
         return numCoins;
+    }
+    @Override
+    public void reset() {
+        this.value = 1;
+        this.remove = false;
+    }
+    public void resetHelper(float x, float y, float scaleX, float scaleY){
+        setX(x);
+        setY(y);
+        this.setSize(w/scaleX, h/scaleY);
+    }
+    public int getValue(){
+        return this.value;
+    }
+    public void setValue(int newVal){
+        this.value = newVal;
     }
 }

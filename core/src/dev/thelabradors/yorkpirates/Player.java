@@ -124,7 +124,8 @@ public class Player extends Sprite{
 	}
     public boolean collidesRight() {
         for(float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2)
-            if(isCellBlocked(getX() + getWidth(), getY() + step) || getX() > 3200)
+            if(isCellBlocked(getX() + getWidth(), getY() + step) || 
+            getX() > GameScreen.mapPixelWidth - this.getWidth())
                 return true;
         return false;
     }
@@ -136,7 +137,8 @@ public class Player extends Sprite{
     }
     public boolean collidesTop() {
         for(float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2)
-            if(isCellBlocked(getX() + step, getY() + getHeight()) || getY() > 3200)
+            if(isCellBlocked(getX() + step, getY() + getHeight()) || 
+            getY() > GameScreen.mapPixelHeight - this.getHeight())
                 return true;
         return false;
 

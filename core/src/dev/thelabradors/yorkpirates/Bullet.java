@@ -9,22 +9,24 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Pool.Poolable;
 
 import org.w3c.dom.Text;
 
-public class Bullet extends Sprite{
+public class Bullet extends Sprite implements Poolable{
 
     private Vector2 startingPosition = new Vector2();
     private boolean remove;
     public static final float SPEED = 500f;
+    public static final float RANGE = 1000f;
     private float dx, dy;
     Texture texture;
 
-    public Bullet(Texture texture, Vector2 position, float angle){
+    public Bullet(Texture texture, float x, float y, float angle){
         super(texture);
         this.setSize(getWidth()/24, getHeight()/24);
-        setX(position.x - this.getWidth()/2);
-        setY(position.y- this.getHeight()/2);
+        setX(x - this.getWidth()/4);
+        setY(y- this.getHeight()/4);
         this.startingPosition.set(getX(), getY());
         this.remove = false;
 
@@ -35,7 +37,7 @@ public class Bullet extends Sprite{
     public void update(float delta){
         setX(getX() + dx*delta);
         setY(getY() + dy*delta);
-        if (startingPosition.dst(getX(), getY()) > 1000){
+        if (startingPosition.dst(getX(), getY()) > RANGE){
             this.remove = true;
         }
     }
@@ -59,5 +61,21 @@ public class Bullet extends Sprite{
     public boolean getRemove(){
         return this.remove;
     }
-    
+
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+        this.remove = false;
+        //this.setSize(200, 200);
+        
+    }
+    public void setdxdy(float angle){
+        this.dx = SPEED * MathUtils.cosDeg(angle);
+        this.dy = SPEED * MathUtils.sinDeg(angle);
+    }
+    public void setPos(float x, float y){
+        this.startingPosition.set(x, y);
+        setX(x - this.getWidth()/2);
+        setY(y - this.getHeight()/2);
+    }
 }

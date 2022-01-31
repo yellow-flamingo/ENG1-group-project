@@ -43,7 +43,7 @@ public class Tasks extends ApplicationAdapter{
 
     public static boolean Collect5Coins(){
         //Need a counter of coins to see if 5 coins has been collected.
-        if(Coin.getNumCoins() >= 5){
+        if(GameScreen.numOfCoins >= 5){
             return true;
         }else{
             return false;
