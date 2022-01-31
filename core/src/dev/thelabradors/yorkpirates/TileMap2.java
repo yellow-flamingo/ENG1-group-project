@@ -3,17 +3,25 @@ package dev.thelabradors.yorkpirates;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -22,6 +30,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.awt.*;
@@ -32,10 +41,8 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
     YorkPiratesGame game;
 
-    public static final int V_WIDTH = 1000;
-    public static final int V_HEIGHT = 600;
-    public static float screenWidth = Gdx.graphics.getWidth();
-    public static float screenHeight = Gdx.graphics.getHeight();
+    public static final int V_WIDTH = 1600;
+    public static final int V_HEIGHT = 900;
     public float cameraX;
     public float cameraY;
     OrthographicCamera camera;
@@ -44,7 +51,6 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     ShapeRenderer shapeRenderer;
     TiledMapRenderer tiledMapRenderer;
     BitmapFont font;
-    Player player;
     static Building constantine;
     static Building goodricke;
     static Building james;
@@ -61,6 +67,21 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     Coin coin10;
     Coin coin11;
     InputProcessor inputProcessor;
+    BitmapFont font12;
+    Player player;
+    Building building1;
+    MapProperties mapProp;
+
+    int mapWidth;
+    int mapHeight;
+    int tilePixelWidth;
+    int tilePixelHeight;
+    int mapPixelWidth;
+    int mapPixelHeight;
+    int mapBorderINT;
+    int mapBorderRight;
+    int mapBorderTop;
+    long startTime;
 
     AssetManager manager;
 
@@ -75,20 +96,16 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     //@Override
     public TileMap2(YorkPiratesGame game) {
         this.game = game;
-        //float aspectRatio = (float)Gdx.graphics.getWidth() / (float)Gdx.graphics.getHeight();
-        //System.out.println("The width: " + Gdx.graphics.getWidth());
-        //System.out.println("The height: " + Gdx.graphics.getHeight());
-        //System.out.println("The height: " + Toolkit.getDefaultToolkit().getScreenSize());
-        //camera = new OrthographicCamera(V_WIDTH, V_HEIGHT);
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Gdx.graphics.getWidth() * 2, Gdx.graphics.getHeight() * 2);
+    }
 
-        //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
-        //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
-        viewport = new FitViewport(camera.viewportWidth/2, camera.viewportHeight/2, camera);
+
+    @Override
+    public void show() {
+        camera = new OrthographicCamera(V_WIDTH, V_HEIGHT);
+        viewport = new FitViewport(camera.viewportWidth, camera.viewportHeight, camera);
         TiledMap tiledMap = new TmxMapLoader().load("Test1.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-        
+        System.out.println("width: " + camera.viewportWidth + " height: " + camera.viewportHeight);
         spriteBatch = new SpriteBatch();
         font = new BitmapFont();
 
@@ -99,18 +116,32 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         manager.load("coin.png", Texture.class);
         manager.finishLoading();
 
+        mapProp = tiledMap.getProperties();
+
+        mapWidth = mapProp.get("width", Integer.class);
+        mapHeight = mapProp.get("height", Integer.class);
+        tilePixelWidth = mapProp.get("tilewidth", Integer.class);
+        tilePixelHeight = mapProp.get("tileheight", Integer.class);
+        mapPixelWidth = mapWidth * tilePixelWidth;
+        mapPixelHeight = mapHeight * tilePixelHeight;
+
+        System.out.println("mapW: " + mapPixelWidth + " mapH: " + mapPixelHeight);
+
+        mapBorderRight = mapPixelWidth - V_WIDTH/2;
+        mapBorderTop = mapPixelHeight - V_HEIGHT/2;
+
         shapeRenderer = new ShapeRenderer();
         Gdx.input.setInputProcessor(this);
         position = new Vector2();
         barrelOffset = new Vector2(1.0f, -0.5f).scl(0.5f); // Relative coordinates to where the barrel is in the sprite
-        player = new Player((Texture) (manager.get("Boat2.png", Texture.class)), (TiledMapTileLayer) tiledMap.getLayers().get(1));
+        player = new Player(manager.get("Boat2.png", Texture.class), (TiledMapTileLayer) tiledMap.getLayers().get(1));
         bullets = new ArrayList<>();
         enemys = new ArrayList<>();
         coins = new ArrayList<>();
-        constantine = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 1000, 600, 180.0f);
-        goodricke = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 700, 2200, 40.0f);
-        james = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2600, 2500, -20.0f);
-        derwent = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2700, 600, -150.0f);
+        constantine = new Building(manager.get("enemy-ship.png", Texture.class), 1000, 600, 180.0f);
+        goodricke = new Building(manager.get("enemy-ship.png", Texture.class), 700, 2200, 40.0f);
+        james = new Building(manager.get("enemy-ship.png", Texture.class), 2600, 2500, -20.0f);
+        derwent = new Building(manager.get("enemy-ship.png", Texture.class), 2700, 600, -150.0f);
         enemys.add(constantine);
         enemys.add(goodricke);
         enemys.add(james);
@@ -136,53 +167,31 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         coin10 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 1500, 1200, 22, 22);
         coins.add(coin10);
     }
-
-//    @Override
-//    public void resize(int width, int height){
-//        viewport.update(width, height);
-//    }
-
     @Override
-    public void show() {
+    public void resize(int width, int height){
+        viewport.update(width, height);
     }
-
     @Override
     public void render(float delta) {
-
-        System.out.println(camera.position.x);
-        System.out.println(player.getX());
 
         if (!manager.update()){
             float progress = manager.getProgress();
             System.out.println("Loading... " + progress * 100 + "%");
         }
-
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        Vector3 vec=new Vector3(player.getX(),player.getY(),0);
-        camera.project(vec);
-
-        cameraX = (float) (player.getX() + Gdx.graphics.getWidth()/1.1 + player.getWidth());
-        cameraY = (float) (player.getY() + Gdx.graphics.getHeight()/1.2 + player.getHeight());
-
-        //camera.position.set(position, 0);
-
-        if (player.getX() < 100) {
-            cameraX = 100 + (float) (Gdx.graphics.getWidth()/1.1 + player.getWidth());
+        cameraX = player.getX() + player.getWidth()/2;
+        if (cameraX < V_WIDTH/2){
+            cameraX = V_WIDTH/2;
+        }else if (cameraX  > mapBorderRight){
+            cameraX = mapBorderRight;
         }
-        if (player.getY() < 100) {
-            cameraY = 100 + (float) (Gdx.graphics.getHeight()/1.2 + player.getHeight());
+        cameraY = player.getY() + player.getHeight()/2;
+        if (cameraY < V_HEIGHT/2){
+            cameraY = V_HEIGHT/2;
+        } else if (cameraY > mapBorderTop){
+            cameraY = mapBorderTop;
         }
-
-        if (player.getX() > 700) {
-            cameraX = 700 + (float) (Gdx.graphics.getWidth()/1.1 + player.getWidth());
-        }
-        if (player.getY() > 1674) {
-            cameraY = 1674 + (float) (Gdx.graphics.getHeight()/1.2 + player.getHeight());
-        }
-        //camera.position.set(position, 0);
-
         camera.position.set(cameraX, cameraY, 0);
         camera.update();
         tiledMapRenderer.setView(camera);
@@ -237,12 +246,11 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         player.draw(spriteBatch);
         font.getData().setScale(5f);
         font.setColor(1,1,1,1);
-
-        font.draw(spriteBatch, "SPACE: SHOOT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/2.7));
-        font.draw(spriteBatch, "UP: FORWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - screenHeight/2);
-        font.draw(spriteBatch, "LEFT: TURN LEFT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.6));
-        font.draw(spriteBatch, "DOWN: BACKWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.3));
-        font.draw(spriteBatch, "RIGHT: TURN RIGHT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.1));
+        // font.draw(spriteBatch, "SPACE: SHOOT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/2.7));
+        // font.draw(spriteBatch, "UP: FORWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - screenHeight/2);
+        // font.draw(spriteBatch, "LEFT: TURN LEFT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.6));
+        // font.draw(spriteBatch, "DOWN: BACKWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.3));
+        // font.draw(spriteBatch, "RIGHT: TURN RIGHT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.1));
         font.getData().setScale(8f);
         font.draw(spriteBatch, Tasks.getNewTask(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2+450);
         font.draw(spriteBatch, "Coins: " + Coin.getNumCoins(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2-900);
@@ -253,9 +261,11 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         font.draw(spriteBatch, "James", 2400, 2800);
         font.draw(spriteBatch, "Derwent", 2500, 825);
         spriteBatch.end();
+
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeType.Line);
         shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
+        shapeRenderer.rect(V_WIDTH/2, V_HEIGHT/2, mapBorderRight - V_WIDTH/2, mapBorderTop - V_HEIGHT/2);
         shapeRenderer.end();
 
         if (enemys.isEmpty() && coins.isEmpty()) {
@@ -264,9 +274,6 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         }
     }
 
-    @Override
-    public void resize(int width, int height){
-    }
 
     @Override
     public void hide() {
@@ -277,13 +284,31 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         super.dispose();
         manager.dispose();
         font.dispose();
+        spriteBatch.dispose();
+        shapeRenderer.dispose();
     }
-
-
     @Override
     public boolean keyDown(int keycode) {
+        if (keycode == Input.Keys.A){
+            player.turnLeft();
+        }
+        if (keycode == Input.Keys.D){
+            player.turnRight();
+        }
+        if (keycode == Input.Keys.W){
+            player.moveForward();
+        }
+        if (keycode == Input.Keys.S){
+            player.moveBackwards();
+        }
         if (keycode == Input.Keys.SPACE){
             bullets.add(new Bullet(manager.get("bullet.png", Texture.class), player.getCenter(), player.getCorrectedAngle()));
+        }
+        if (keycode == Input.Keys.P){
+            System.out.println(camera.position);
+        }
+        if (keycode == Input.Keys.U){
+            player.getCoords();
         }
         if (keycode == Input.Keys.UP){
             player.moveForward();
@@ -304,48 +329,18 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     }
 
     @Override
-    public boolean keyTyped(char character) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved(int screenX, int screenY) {
-        return false;
-    }
-
-    @Override
-    public boolean scrolled(float amountX, float amountY) {
-        return false;
-    }
-
-    @Override
     public boolean keyUp(int keycode) {
         if (keycode == Input.Keys.A){
-            player.stopHorizontal();
+            player.stopTurn();
         }
         if (keycode == Input.Keys.D){
-            player.stopHorizontal();
+            player.stopTurn();
         }
         if (keycode == Input.Keys.W){
-            player.stopVertical();
+            player.stopMove();
         }
         if (keycode == Input.Keys.S){
-            player.stopVertical();
+            player.stopMove();
         }
         if (keycode == Input.Keys.UP){
             player.stopMove();
@@ -361,5 +356,34 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         }
         return true;
     }
-
+    @Override
+    public boolean keyTyped(char character) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

@@ -29,7 +29,6 @@ public class Enemy extends Sprite{
             this.remove = true;
         }
     }
-
     public void hit(){
         this.health -= 1;
     }
