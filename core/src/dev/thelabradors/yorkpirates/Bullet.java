@@ -22,11 +22,11 @@ public class Bullet extends Sprite implements Poolable{
     private float dx, dy;
     Texture texture;
 
-    public Bullet(Texture texture, Vector2 position, float angle){
+    public Bullet(Texture texture, float x, float y, float angle){
         super(texture);
         this.setSize(getWidth()/24, getHeight()/24);
-        setX(position.x - this.getWidth()/2);
-        setY(position.y- this.getHeight()/2);
+        setX(x - this.getWidth()/2);
+        setY(y- this.getHeight()/2);
         this.startingPosition.set(getX(), getY());
         this.remove = false;
 
@@ -73,10 +73,9 @@ public class Bullet extends Sprite implements Poolable{
         this.dx = SPEED * MathUtils.cosDeg(angle);
         this.dy = SPEED * MathUtils.sinDeg(angle);
     }
-    public void setPos(Vector2 pos){
-        this.startingPosition = pos;
-        setX(pos.x - this.getWidth()/2);
-        setY(pos.y - this.getHeight()/2);
+    public void setPos(float x, float y){
+        this.startingPosition.set(x, y);
+        setX(x - this.getWidth()/2);
+        setY(y - this.getHeight()/2);
     }
-    
 }
