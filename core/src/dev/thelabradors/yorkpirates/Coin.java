@@ -9,12 +9,12 @@ public class Coin extends Sprite{
     public float x, y;
     public boolean remove;
     static int numCoins;
-    public Coin(Texture tex, float x, float y){
+    public Coin(Texture tex, float x, float y, float scaleX, float scaleY){
         super(tex);
         setX(x);
         setY(y);
         this.remove = false;
-        this.setSize(getWidth()/22, getHeight()/22);
+        this.setSize(getWidth()/scaleX, getHeight()/scaleY);
     }
     public void draw(SpriteBatch spriteBatch){
         super.draw(spriteBatch);
@@ -34,6 +34,7 @@ public class Coin extends Sprite{
         }
         return false;
     }
+
     public static int getNumCoins() {
         return numCoins;
     }

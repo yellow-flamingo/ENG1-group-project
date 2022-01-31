@@ -11,6 +11,9 @@ import com.badlogic.gdx.ApplicationListener;
 
 
 public class Tasks extends ApplicationAdapter{
+
+    YorkPiratesGame game;
+
     private SpriteBatch batch;
     private BitmapFont font;
     static String task;
@@ -26,11 +29,16 @@ public class Tasks extends ApplicationAdapter{
     public static String getNewTask() {
         if(Collect5Coins()==false){
             task = "Collect 5 coins";
-        }
-        else{
-            if(shoot7Goodricke()==false){
-                task = "Shoot Goodricke 7 times";
-            }
+        } else if (shoot7Goodricke()==false) {
+            task = "Shoot Goodricke 7 times";
+        } else if (shoot7Constantine() == false) {
+            task = "Shoot constantine 7 times";
+        } else if (shoot7James() == false) {
+            task = "Shoot James 7 times";
+        } else if (shoot7Derwent() == false) {
+            task = "Shoot Derwent 7 times";
+        } else {
+            task = "Collect remaining coins";
         }
         return task;
     }
@@ -43,7 +51,32 @@ public class Tasks extends ApplicationAdapter{
             return false;
         }
     }
+
     public static boolean shoot7Goodricke() {
+        if (TileMap2.goodricke.health == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean shoot7Constantine() {
+        if (TileMap2.constantine.health == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean shoot7James() {
+        if (TileMap2.james.health == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean shoot7Derwent() {
+        if (TileMap2.derwent.health == 0) {
+            return true;
+        }
         return false;
     }
 

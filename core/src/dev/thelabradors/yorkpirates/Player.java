@@ -123,26 +123,26 @@ public class Player extends Sprite{
 	}
     public boolean collidesRight() {
         for(float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2)
-            if(isCellBlocked(getX() + getWidth(), getY() + step))
+            if(isCellBlocked(getX() + getWidth(), getY() + step) || getX() > 3200)
                 return true;
         return false;
     }
     public boolean collidesLeft() {
         for(float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2)
-            if(isCellBlocked(getX(), getY() + step))
+            if(isCellBlocked(getX(), getY() + step) || getX() < 0)
                 return true;
         return false;
     }
     public boolean collidesTop() {
         for(float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2)
-            if(isCellBlocked(getX() + step, getY() + getHeight()))
+            if(isCellBlocked(getX() + step, getY() + getHeight()) || getY() > 3200)
                 return true;
         return false;
 
     }
     public boolean collidesBottom() {
         for(float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2)
-            if(isCellBlocked(getX() + step, getY()))
+            if(isCellBlocked(getX() + step, getY()) || getY() < 0)
                 return true;
         return false;
         }

@@ -20,10 +20,13 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import java.awt.*;
+
+import static java.awt.Color.*;
 
 public class TileMap2 extends ApplicationAdapter implements InputProcessor, Screen {
 
@@ -42,10 +45,10 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     TiledMapRenderer tiledMapRenderer;
     BitmapFont font;
     Player player;
-    Building building1;
-    Building building2;
-    Building building3;
-    Building building4;
+    static Building constantine;
+    static Building goodricke;
+    static Building james;
+    static Building derwent;
     Coin coin1;
     Coin coin2;
     Coin coin3;
@@ -56,6 +59,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     Coin coin8;
     Coin coin9;
     Coin coin10;
+    Coin coin11;
     InputProcessor inputProcessor;
 
     AssetManager manager;
@@ -81,7 +85,7 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
         //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         //camera.position.set(camera.viewportWidth, camera.viewportHeight, 0);
-        //viewport = new FitViewport(camera.viewportWidth/2, camera.viewportHeight/2, camera);
+        viewport = new FitViewport(camera.viewportWidth/2, camera.viewportHeight/2, camera);
         TiledMap tiledMap = new TmxMapLoader().load("Test1.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         
@@ -103,33 +107,33 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         bullets = new ArrayList<>();
         enemys = new ArrayList<>();
         coins = new ArrayList<>();
-        building1 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 1000, 600, 180.0f);
-        building2 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 700, 2200, 40.0f);
-        building3 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2600, 2500, -20.0f);
-        building4 = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2700, 600, -150.0f);
-        enemys.add(building1);
-        enemys.add(building2);
-        enemys.add(building3);
-        enemys.add(building4);
-        coin1 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 850);
+        constantine = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 1000, 600, 180.0f);
+        goodricke = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 700, 2200, 40.0f);
+        james = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2600, 2500, -20.0f);
+        derwent = new Building((Texture) (manager.get("enemy-ship.png", Texture.class)), 2700, 600, -150.0f);
+        enemys.add(constantine);
+        enemys.add(goodricke);
+        enemys.add(james);
+        enemys.add(derwent);
+        coin1 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 850, 22, 22);
         coins.add(coin1);
-        coin2 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 250, 250);
+        coin2 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 250, 250, 22, 22);
         coins.add(coin2);
-        coin3 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 300, 500);
+        coin3 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 300, 500, 22, 22);
         coins.add(coin3);
-        coin4 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 350);
+        coin4 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 350, 22, 22);
         coins.add(coin4);
-        coin5 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 2000, 800);
+        coin5 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 2000, 800, 22, 22);
         coins.add(coin5);
-        coin6 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 850, 200);
+        coin6 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 850, 200, 22, 22);
         coins.add(coin6);
-        coin7 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 325, 1500);
+        coin7 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 325, 1500, 22, 22);
         coins.add(coin7);
-        coin8 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 1300);
+        coin8 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 500, 1300, 22, 22);
         coins.add(coin8);
-        coin9 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 1700);
+        coin9 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 700, 1700, 22, 22);
         coins.add(coin9);
-        coin10 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 1500, 1200);
+        coin10 = new Coin((Texture) (manager.get("coin.png", Texture.class)), 1500, 1200, 22, 22);
         coins.add(coin10);
     }
 
@@ -145,6 +149,9 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
     @Override
     public void render(float delta) {
 
+        System.out.println(camera.position.x);
+        System.out.println(player.getX());
+
         if (!manager.update()){
             float progress = manager.getProgress();
             System.out.println("Loading... " + progress * 100 + "%");
@@ -152,6 +159,10 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        Vector3 vec=new Vector3(player.getX(),player.getY(),0);
+        camera.project(vec);
+
         cameraX = (float) (player.getX() + Gdx.graphics.getWidth()/1.1 + player.getWidth());
         cameraY = (float) (player.getY() + Gdx.graphics.getHeight()/1.2 + player.getHeight());
 
@@ -199,6 +210,14 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
             enemy.draw(spriteBatch);
             if (enemy.getRemove()){
                 enemiesToRemove.add(enemy);
+                if (enemy == constantine) {
+                    coins.add(new Coin((Texture) (manager.get("coin.png", Texture.class)), enemy.getX(), enemy.getY()+250, 10, 10));
+                } else if (enemy == goodricke) {
+                    coins.add(new Coin((Texture) (manager.get("coin.png", Texture.class)), enemy.getX()+200, enemy.getY()-120, 10, 10));
+                } else if (enemy == james) {
+                    coins.add(new Coin((Texture) (manager.get("coin.png", Texture.class)), enemy.getX()-200, enemy.getY()-120, 10, 10));
+                }
+
             }
         }
         bullets.removeAll(bulletsToRemove);
@@ -217,6 +236,9 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
 
         player.draw(spriteBatch);
         font.getData().setScale(5f);
+        font.setColor(1,1,1,1);
+
+        font.draw(spriteBatch, "SPACE: SHOOT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/2.7));
         font.draw(spriteBatch, "UP: FORWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - screenHeight/2);
         font.draw(spriteBatch, "LEFT: TURN LEFT", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.6));
         font.draw(spriteBatch, "DOWN: BACKWARDS", camera.position.x - - (int) (screenWidth/2.5), camera.position.y - (int) (screenHeight/1.3));
@@ -225,16 +247,19 @@ public class TileMap2 extends ApplicationAdapter implements InputProcessor, Scre
         font.draw(spriteBatch, Tasks.getNewTask(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2+450);
         font.draw(spriteBatch, "Coins: " + Coin.getNumCoins(), camera.position.x - V_WIDTH/2-700, camera.position.y + V_HEIGHT/2-900);
         font.getData().setScale(4f);
+        font.setColor(1,0,0,1);
         font.draw(spriteBatch, "Constantine", 935, 825);
-        font.draw(spriteBatch, "Goodricke", 300, 2900);
-        font.draw(spriteBatch, "James", 2400, 3100);
+        font.draw(spriteBatch, "Goodricke", 400, 2500);
+        font.draw(spriteBatch, "James", 2400, 2800);
+        font.draw(spriteBatch, "Derwent", 2500, 825);
         spriteBatch.end();
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeType.Line);
         shapeRenderer.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
         shapeRenderer.end();
 
-        if (enemys.isEmpty()) {
+        if (enemys.isEmpty() && coins.isEmpty()) {
+            Coin.numCoins = 0;
             game.setScreen(new GameWonScreen(game));
         }
     }
