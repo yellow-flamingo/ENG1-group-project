@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Building extends Enemy{
-    public Building(Texture tex, float x, float y, float angle){
-        super(tex, x, y, 7, angle);
+    public Building(Texture tex, float x, float y, int health, float angle){
+        super(tex, x, y, health, angle);
     }
 }

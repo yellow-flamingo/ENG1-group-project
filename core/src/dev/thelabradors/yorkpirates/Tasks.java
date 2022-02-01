@@ -27,14 +27,12 @@ public class Tasks extends ApplicationAdapter{
     public static String getNewTask() {
         if(Collect5Coins()==false){
             task = "Collect 5 coins";
-        } else if (shoot7Goodricke()==false) {
-            task = "Shoot Goodricke 7 times";
-        } else if (shoot7Constantine() == false) {
-            task = "Shoot constantine 7 times";
-        } else if (shoot7James() == false) {
-            task = "Shoot James 7 times";
-        } else if (shoot7Derwent() == false) {
-            task = "Shoot Derwent 7 times";
+        } else if (GameScreen.goodricke.health > 0) {
+            task = "Shoot Goodricke " + GameScreen.goodricke.health + " times";
+        } else if (GameScreen.constantine.health > 0) {
+            task = "Shoot constantine " + GameScreen.constantine.health + " times";
+        } else if (GameScreen.james.health > 0) {
+            task = "Shoot James " + GameScreen.james.health + " times";
         } else {
             task = "Collect remaining coins";
         }
@@ -50,33 +48,6 @@ public class Tasks extends ApplicationAdapter{
         }
     }
 
-    public static boolean shoot7Goodricke() {
-        if (GameScreen.goodricke.health == 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean shoot7Constantine() {
-        if (GameScreen.constantine.health == 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean shoot7James() {
-        if (GameScreen.james.health == 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean shoot7Derwent() {
-        if (GameScreen.derwent.health == 0) {
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public void dispose(){

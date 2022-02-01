@@ -5,6 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class ChooseCollegeScreen implements Screen {
 
@@ -14,9 +18,9 @@ public class ChooseCollegeScreen implements Screen {
         this.game = game;
     }
 
-
     @Override
     public void show() {
+
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keyCode) {
@@ -40,12 +44,13 @@ public class ChooseCollegeScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         game.batch.begin();
-        game.font.getData().setScale(3f);
-        game.font.draw(game.batch, "Choose your college! - type the corresponding letter", Gdx.graphics.getWidth() * .15f, Gdx.graphics.getHeight() * .75f);
-        game.font.draw(game.batch, "A - Alcuin", Gdx.graphics.getWidth() * .3f, Gdx.graphics.getHeight() * .55f);
-        game.font.draw(game.batch, "L - Langwith", Gdx.graphics.getWidth() * .3f, Gdx.graphics.getHeight() * .4f);
-        game.font.draw(game.batch, "H - Halifax", Gdx.graphics.getWidth() * .3f, Gdx.graphics.getHeight() * .25f);
+        game.font.getData().setScale(Gdx.graphics.getWidth() / 385);
+        game.font.draw(game.batch, "Choose your college! - type the corresponding letter", Gdx.graphics.getWidth() * .1f, Gdx.graphics.getHeight() * .75f);
+        game.font.draw(game.batch, "A - Alcuin", Gdx.graphics.getWidth() * .2f, Gdx.graphics.getHeight() * .55f);
+        game.font.draw(game.batch, "L - Langwith", Gdx.graphics.getWidth() * .2f, Gdx.graphics.getHeight() * .4f);
+        game.font.draw(game.batch, "H - Halifax", Gdx.graphics.getWidth() * .2f, Gdx.graphics.getHeight() * .25f);
         game.batch.end();
 
     }

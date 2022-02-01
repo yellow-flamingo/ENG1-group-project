@@ -11,7 +11,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		java.awt.Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-		config.setWindowedMode((int) (size.getWidth() * 0.4), (int) (size.getHeight() * 0.4));
+		config.setWindowedMode((int) (size.getWidth() * 0.8), (int) (size.getHeight() * 0.8));
 		new Lwjgl3Application(new YorkPiratesGame(), config);
 	}
 }

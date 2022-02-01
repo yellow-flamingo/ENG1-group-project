@@ -11,21 +11,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -43,8 +35,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
     TiledMapRenderer tiledMapRenderer;
     static Building constantine;
     static Building goodricke;
-    static Building james;
-    static Building derwent;
+    static Building james;;
     Player player;
     MapProperties mapProp;
 
@@ -60,12 +51,11 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
 
     AssetManager manager;
 
-    boolean showControls = true;
+    boolean showControls;
 
     boolean constantineCapture;
     boolean goodrickeCapture;
     boolean jamesCapture;
-    boolean derwentCapture;
     public static int numOfCoins;
 
 
@@ -89,7 +79,6 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         constantineCapture = false;
         goodrickeCapture = false;
         jamesCapture = false;
-        derwentCapture = false;
         numOfCoins = 0;
         showControls = true;
     }
@@ -128,16 +117,14 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
 
         game.coins.clear();
 
-        constantine = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 1000, 600, 180.0f);
-        goodricke = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 700, 2200, 40.0f);
-        james = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 2600, 2500, -20.0f);
-        derwent = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 2700, 600, -150.0f);
-        
+        constantine = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 1000, 600, 7, 180.0f);
+        goodricke = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 700, 2200, 4, 40.0f);
+        james = new Building(manager.get(game.imgMap.get("enemy-ship"), Texture.class), 2600, 2500, 3, -20.0f);
 
         game.enemys.add(constantine);
         game.enemys.add(goodricke);
         game.enemys.add(james);
-        game.enemys.add(derwent);
+
         //Adding all the current coins to the game.
         for (int i = 0; i < coinsData.length; i+= 4){
                 Coin c = game.coinPool.obtain();
@@ -148,10 +135,12 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         System.out.println(game.coins.size());
         startTime = TimeUtils.millis();
     }
+
     @Override
     public void resize(int width, int height){
         viewport.update(width, height);
     }
+
     @Override
     public void render(float delta) {
 
@@ -243,6 +232,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         game.font.getData().setScale(4.5f);
         game.font.setColor(1,1,1,1);
         if (showControls == true){
+            game.font.draw(game.batch, "ENTER: restart",      (float) (camera.position.x + 50),    (float) (camera.position.y - 30));
             game.font.draw(game.batch, "SPACE: SHOOT",      (float) (camera.position.x + 50),    (float) (camera.position.y - 90));
             game.font.draw(game.batch, "UP/W: FORWARDS",      (float) (camera.position.x + 50),    (float) (camera.position.y - 150));
             game.font.draw(game.batch, "LEFT/A: TURN LEFT",   (float) (camera.position.x + 50),    (float) (camera.position.y - 210));
@@ -276,28 +266,19 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         game.font.draw(game.batch, "James", 2400, 2800);
         game.font.setColor(1,0,0,1);
 
-        if (derwentCapture) {
-            game.font.setColor(0,1,0,1);
-        }
-        game.font.draw(game.batch, "Derwent", 2500, 825);
-        game.font.setColor(1,0,0,1);
-
         game.font.getData().setScale(3f);
         game.font.draw(game.batch, game.playerCollege, player.getX() - player.getWidth()/2, player.getY());
 
         game.batch.end();
 
         game.sr.setProjectionMatrix(camera.combined);
-        game.sr.begin(ShapeType.Line);
-        //game.sr.rect(player.getX(), player.getY(), player.getWidth(), player.getHeight());
-        //game.sr.rect(V_WIDTH/2, V_HEIGHT/2, mapBorderRight - V_WIDTH/2, mapBorderTop - V_HEIGHT/2);
-        game.sr.end();
+        //game.sr.begin(ShapeType.Line);
+        //game.sr.end();
 
         if (game.enemys.isEmpty() && game.coins.isEmpty()) {
             game.setScreen(new GameWonScreen(game));
         }
     }
-
 
     @Override
     public void hide() {
@@ -308,6 +289,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         super.dispose();
         manager.dispose();
     }
+
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.A){
@@ -325,7 +307,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         if (keycode == Input.Keys.SPACE){
             Bullet b = game.bulletPool.obtain();
             b.setdxdy(player.getCorrectedAngle());
-            b.setPos(player.getX(), player.getY());
+            b.setPos(player.getX() + player.getWidth()/2, player.getY() + player.getHeight());
             game.bullets.add(b);
         }
         if (keycode == Input.Keys.P){
@@ -347,7 +329,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
             player.turnRight();
         }
         if (keycode == Input.Keys.ENTER){
-            game.setScreen(new GameWonScreen(game));
+            game.setScreen(new GameScreen(game));
         }
         if (keycode == Input.Keys.H){
             showControls = !showControls;
@@ -383,6 +365,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         }
         return true;
     }
+
     @Override
     public boolean keyTyped(char character) {
         // TODO Auto-generated method stub
@@ -413,5 +396,4 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         // TODO Auto-generated method stub
         return false;
     }
-
 }
