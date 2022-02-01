@@ -307,7 +307,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         if (keycode == Input.Keys.SPACE){
             Bullet b = game.bulletPool.obtain();
             b.setdxdy(player.getCorrectedAngle());
-            b.setPos(player.getX() + player.getWidth()/2, player.getY() + player.getHeight());
+            b.setPos(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2);
             game.bullets.add(b);
         }
         if (keycode == Input.Keys.P){
