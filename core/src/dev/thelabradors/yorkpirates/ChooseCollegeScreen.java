@@ -13,11 +13,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class ChooseCollegeScreen implements Screen {
 
     YorkPiratesGame game;
-
+    /**
+     * Allows the user to choose which college they would like to join
+     * @param game passes though the main game class.
+     */
     public ChooseCollegeScreen(YorkPiratesGame game) {
         this.game = game;
     }
-
+    /**
+     * Called at the start of the game.
+     * Player presses first letter of the college to join the college
+     * college is shown under the boat during the game.
+     */
     @Override
     public void show() {
 
@@ -26,20 +33,19 @@ public class ChooseCollegeScreen implements Screen {
             public boolean keyDown(int keyCode) {
                 if (keyCode == Input.Keys.A) {
                     game.playerCollege = "Alcuin";
-                    game.setScreen(new StartScreen(game));
+                    game.setScreen(game.startScreen);
                 } else if (keyCode == Input.Keys.L) {
                     game.playerCollege = "Langwith";
-                    game.setScreen(new StartScreen(game));
+                    game.setScreen(game.startScreen);
                 } else if (keyCode == Input.Keys.H) {
                     game.playerCollege = "Halifax";
-                    game.setScreen(new StartScreen(game));
+                    game.setScreen(game.startScreen);
                 }
                 return true;
             }
         });
     }
-
-
+    /** Render text on the screen */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -54,29 +60,24 @@ public class ChooseCollegeScreen implements Screen {
         game.batch.end();
 
     }
-
+    /** Not used for this class */
     @Override
     public void resize(int width, int height) {
-
     }
-
+    /** Not used for this class */
     @Override
     public void pause() {
-
     }
-
+    /** Not used for this class */
     @Override
     public void resume() {
-
     }
-
+    /** Not used for this class */
     @Override
     public void hide() {
-
     }
-
+    /** Not used for this class */
     @Override
     public void dispose() {
-
     }
 }
