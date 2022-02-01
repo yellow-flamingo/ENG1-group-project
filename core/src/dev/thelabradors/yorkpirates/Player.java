@@ -169,7 +169,7 @@ public class Player extends Sprite{
      */
     public boolean collidesLeft() {
         for(float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2)
-            if(isCellBlocked(getX(), getY() + step) || getX() < 0)
+            if(isCellBlocked(getX(), getY() + step) || getX() - this.getWidth()/2 < 0)
                 return true;
         for (Enemy enemy:game.enemys) {
             Rectangle enemyRec = enemy.getBoundingRectangle();
@@ -209,7 +209,7 @@ public class Player extends Sprite{
      */
     public boolean collidesBottom() {
         for(float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2)
-            if(isCellBlocked(getX() + step, getY()) || getY() < 0)
+            if(isCellBlocked(getX() + step, getY()) || getY() - this.getHeight()/2 < 0)
                 return true;
         for (Enemy enemy:game.enemys) {
             Rectangle enemyRec = enemy.getBoundingRectangle();
