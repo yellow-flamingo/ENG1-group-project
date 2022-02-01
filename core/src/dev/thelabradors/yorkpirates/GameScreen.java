@@ -120,7 +120,7 @@ public class GameScreen extends ApplicationAdapter implements InputProcessor, Sc
         mapBorderTop = mapPixelHeight - V_HEIGHT/2;
 
         Gdx.input.setInputProcessor(this);
-        player = new Player(manager.get(game.imgMap.get("player"), Texture.class), (TiledMapTileLayer) tiledMap.getLayers().get(1));
+        player = new Player(manager.get(game.imgMap.get("player"), Texture.class), (TiledMapTileLayer) tiledMap.getLayers().get(1), game);
 
         game.bullets.clear();
 

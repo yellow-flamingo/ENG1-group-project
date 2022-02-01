@@ -46,6 +46,7 @@ public class Enemy extends Sprite implements Poolable{
         this.health = health;
         this.setRotation(angle);
     }
+
     @Override
     public void reset() {
         // TODO Auto-generated method stub

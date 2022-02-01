@@ -66,7 +66,6 @@ public class Bullet extends Sprite implements Poolable{
     public void reset() {
         // TODO Auto-generated method stub
         this.remove = false;
-        //this.setSize(200, 200);
         
     }
     public void setdxdy(float angle){

@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.*;
 
 public class Player extends Sprite{
+    YorkPiratesGame game;
     public float speed = 0;
     public static final float TOTALVELOCITY = 250;
     public static final float IMAGE_CORRECTION_ANGLE = 90;
@@ -19,8 +20,10 @@ public class Player extends Sprite{
     public float angle;
     public float angleChange;
     public Vector2 velocity = new Vector2();
-    public Player(Texture tex , TiledMapTileLayer collisionLayer){
+    Rectangle playerRec;
+    public Player(Texture tex , TiledMapTileLayer collisionLayer, YorkPiratesGame game){
         super(tex);
+        this.game = game;
         this.w = 117; //117
         this.h = 200; //200
         setSize(w/2, h/2);
@@ -32,7 +35,9 @@ public class Player extends Sprite{
         this.setOriginCenter();
         this.setRotation(angle);
         this.collisionLayer = collisionLayer;
+        this.playerRec = this.getBoundingRectangle();
     }
+
     public void update(float delta){
         //Change the Angle
         angle += angleChange*delta;
@@ -127,12 +132,26 @@ public class Player extends Sprite{
             if(isCellBlocked(getX() + getWidth(), getY() + step) || 
             getX() > GameScreen.mapPixelWidth - this.getWidth())
                 return true;
+        for (Enemy enemy:game.enemys) {
+            Rectangle enemyRec = enemy.getBoundingRectangle();
+            Rectangle intersection = new Rectangle();
+            Intersector.intersectRectangles(enemyRec, playerRec, intersection);
+            if(intersection.x> playerRec.x)
+                return true;
+        }
         return false;
     }
     public boolean collidesLeft() {
         for(float step = 0; step < getHeight(); step += collisionLayer.getTileHeight() / 2)
             if(isCellBlocked(getX(), getY() + step) || getX() < 0)
                 return true;
+        for (Enemy enemy:game.enemys) {
+            Rectangle enemyRec = enemy.getBoundingRectangle();
+            Rectangle intersection = new Rectangle();
+            Intersector.intersectRectangles(enemyRec, playerRec, intersection);
+            if (intersection.x > enemyRec.x)
+                return true;
+        }
         return false;
     }
     public boolean collidesTop() {
@@ -140,6 +159,13 @@ public class Player extends Sprite{
             if(isCellBlocked(getX() + step, getY() + getHeight()) || 
             getY() > GameScreen.mapPixelHeight - this.getHeight())
                 return true;
+            for (Enemy enemy:game.enemys) {
+                Rectangle enemyRec = enemy.getBoundingRectangle();
+                Rectangle intersection = new Rectangle();
+                Intersector.intersectRectangles(enemyRec, playerRec, intersection);
+                if(intersection.y > playerRec.y)
+                    return true;
+            }
         return false;
 
     }
@@ -147,6 +173,13 @@ public class Player extends Sprite{
         for(float step = 0; step < getWidth(); step += collisionLayer.getTileWidth() / 2)
             if(isCellBlocked(getX() + step, getY()) || getY() < 0)
                 return true;
+        for (Enemy enemy:game.enemys) {
+            Rectangle enemyRec = enemy.getBoundingRectangle();
+            Rectangle intersection = new Rectangle();
+            Intersector.intersectRectangles(enemyRec, playerRec, intersection);
+            if(intersection.y > enemyRec.y)
+                return true;
+        }
         return false;
         }
     //getter for x,y coords
